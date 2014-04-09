@@ -1,0 +1,335 @@
+Go in HEP
+Golang-Paris, 2014/04/09
+
+Sebastien Binet
+CNRS/IN2P3
+
+
+* Go in High Energy Physics (HEP)
+
+.image figs/mad-scientist-gopher.jpg
+
+
+* HEP (High Energy Physics)
+
+Field of physics which studies the fundamental laws of Nature and the
+properties of the constituents of matter.
+
+Many labs working on HEP around the world. 
+But, perhaps one of the most famous ones is [[http://cern.ch][CERN]].
+
+
+* CERN
+
+.image figs/cernaerial.jpg 500 700
+
+
+* CERN-LHC
+
+LHC: Large Hadron Collider.
+A proton-proton collider of 27km of circonference.
+
+.image figs/cernring-l.jpg 450 700
+
+
+* LHC tunnel and one of the ~1200 dipole magnets
+
+.image figs/lhc-magnet.jpg 500 700
+
+
+* ATLAS detector (44m x 25m)
+
+.image figs/atlas-detector.gif 600 800
+
+
+* ATLAS installation
+
+.image figs/pit.png
+
+
+* Results
+
+.image figs/higgs-to-2e2mu-candidate.png 500 700
+
+
+* High level view of the data pipeline
+
+Data is collected at one of 4 interaction points
+
+- collisions every 150 ns
+- ~1.6 Mb / collision
+- ~1 Pb/year of raw data (~10 Pb with replicates)
+
+Raw data is then filtered to only keep "interesting" events (collisions of protons)
+
+
+* Main steps of data analysis/massaging
+
+#Monte-Carlo techniques
+
+- *Generation:* production of a single physics event (_e.g.:_ a collision and its decay products)
+- *Simulation:* modelisation of the interactions b/w particles and detector material
+- *Reconstruction:* building physics objects (electrons, photons, ...) from the detector signals (energy deposits)
+- *Analysis:* analyse reconstruction output(s) to test hypotheses
+
+.image figs/schema-general-flux-all.png 300 300
+
+#* 
+#
+#.image figs/data-flux-summary-all.png 400 700
+
+
+* Software in HEP
+
+Historically, software in HEP has been written in *FORTRAN-77*.
+
+- HEP people even wrote compilers
+- HEP community even defined a few extensions (*MORTRAN*)
+
+Mid-90's: migration to *C++*
+
+Mid-2000's: *Python* gained tremendous mindshare 
+
+- first thru the steering of *C++* binaries
+- then as complete analyses glueing *C++* libraries together
+
+
+* Software in HEP - some numbers
+
+An LHC experiment (_e.g._ ATLAS, CMS) is ~3000 physicists but only a
+fraction of those is developing code.
+
+Reconstruction frameworks grew from ~3M SLOC to ~5M
+
+Summing over all HEP software stack for e.g. ATLAS:
+
+- event generators: ~1.4M SLOC (C++, FORTRAN-77)
+- I/O libraries ~1.7M SLOC (C++)
+- simulation libraries ~1.2M SLOC (C++)
+- reconstruction framework ~5M SLOC (C++) + steering/configuration (~1M SLOC python) (want to have look at the [[http://acode-browser.usatlas.bnl.gov/lxr/source/][ATLAS code]] ?)
+
+
+
+
+*GCC:* ~7M SLOC
+
+*Linux* *kernel* *3.6:* 15.9M SLOC
+
+* People committing code to VCS per month
+
+Variety of skills
+Huge turn-around
+Once the physics data is pouring, people go doing physics instead of software
+
+
+.image figs/cmssw-commits.png 400 600
+
+
+* Software developers
+
+~300 active developers (per experiment)
+
+~1000 different developers integrated over the lifetime of a single LHC experiment.
+
+- few "real" s/w experts
+- some physicists with strong skill set in s/w
+- many with some experience in s/w development
+- some with *no* experience in s/w development
+
+A multi-timezone environment
+
+- Europe, North-America, Japan, Russia
+
+Many communities (core s/w people, generators, simulation, ...)
+
+Development and infrastructures usually CERN-centric
+
+Heavily Linux based ([[http://cern.ch/linux][Scientific Linux CERN]])
+
+
+* Software development cycle
+
+VCS (CVS, then SVN. GIT: not yet)
+
+Nightlies (Jenkins or homegrown solution)
+
+- need a sizeable cluster of build machines (distcc, ccache, ...)
+- builds the framework stack in ~8h
+- produces ~2000 shared libraries
+- installs them on AFS (also creates RPMs and tarballs)
+
+Devs can then test and develop off the nightly _via_ AFS
+
+Every 6 months or so a new production release is cut, validated (then patched) and deployed on the World Wide LHC Computing Grid (WLCG).
+
+Release size: *~5Gb*
+
+- binaries, libraries (externals+framework stack)
+- extra data (sqlite files, physics processes' modelisation data, ...)
+
+
+* Software runtime ?
+
+Big science, big data, big software, big numbers
+
+- ~1min to initialize the application
+- loading >500 shared libraries
+- connecting to databases (detector description, geometry, ...)
+- instantiating ~2000 C++ components
+- 2Gb/4Gb memory footprint per process
+
+* (obligatory xkcd reference)
+
+.image figs/xkcd-compiling.png 550 550
+
+
+* 
+
+We learn to love hating our framework. (every step of the way)
+
+And even more so in the future:
+
+- work to make our software stack thread-safe
+- or at least parts of it multithread friendly to harness multicore machines
+- quite a lot of fun ahead
+
+
+* Remember Go ?
+
+- compiles quickly (no warnings, imports)
+- enforces coherent coding rules (across projects)
+- builtin test/benchmark/documentation facilities
+- deploys easily, cross-compiles easily
+- installs easily (also 3rd-party packages: _"go_get"_)
+- fast to pick up, not as complicated as *C++*
+- builtin reflection system
+- builtin (un)serialization capabilities
+- concurrency support
+- garbage collected
+
+
+*Perfect* *match* for many HEP use cases.
+
+
+* Migrating to Go ? (evil plan for (HEP) world domination)
+
+Migrating ~5M SLOC of C++ code to Go, during data taking, *unfortunately*, won't fly.
+
+Creating new applications for data massaging or post-processing *might*.
+
+Creating a new concurrent and parallel framework for the next accelerator *might*.
+
+Need to build a critical mass of Go HEP enthusiasts
+
+
+So far:
+
+- building the packages to read/write data in HEP formats (see under [[http://github.com/go-hep][go-hep]])
+- built a proof of concept of a concurrent framework: [[http://github.com/go-hep/gaudi-fwk][go-hep/gaudi-fwk]]
+- now building the real thing [[http://github.com/go-hep/fwk][go-hep/fwk]]
+- building a physics simulation detector app on top of go-hep/fwk: [[http://github.com/go-hep/fads][go-hep/fads]]
+- building a package of data analysis facilities
+
+
+* Experience so far
+
+Wrapping `C++` libraries (via a C-shim) with `cgo` is ~OK
+
+- time consumming (no surprise)
+- like for `Python`, you don't want to cross language boundaries too frequently (perfs!)
+- using the `SWIG` support wasn't possible (because of some `C++` constructs not supported by `SWIG` 's parser)
+
+
+* Experience so far
+
+No shared libraries.
+
+- plugin systems (heavily used in our reconstruction frameworks) uses shared libraries
+- no, funneling data through some IPC won't fly (for our use case)
+- actually not a limitation: re-compile on the fly, fork-exec (and still faster than booting `Python` VM + loading shared libraries, plus you get a static binary)
+
+
+* Experience so far
+
+Building small (and not so small) command-line utilities (a la `git`) is fun.
+
+- Wrote a build tool that way ([[http://github.com/hwaf/hwaf][hwaf]])
+
+
+Building a concurrent framework is also fun and surprisingly easy (thanks to `goroutines` and `channels`.)
+
+- see [[https://indico.fnal.gov/getFile.py/access?contribId=15&sessionId=4&resId=0&materialId=slides&confId=4986][go-fwk]] and [[http://indico.cern.ch/event/93877/session/6/contribution/49/material/slides/0.pdf][go-hep@ACAT-2011]] for more details
+
+
+* Experience so far
+
+No generics/templates, no operator overloading.
+
+
+In my experience, this hasn't been a limitation.
+
+Operator overloading isn't a panacea.
+
+Generics can easily be implemented with:
+
+  $ gofmt -r 'T -> MyType' tmpl.go > mytype.go
+
+
+(without the build-time cost that `C++` templates impose)
+
+
+* What about number crunching ?
+
+The `gc` compiler isn't applying all the optimizations it could:
+
+.code -edit -numbers code/boundcheck.go
+
+Even though `xs[i]` is guaranteed to be valid, a bound check is performed.
+
+Other missed opportunity: `AVX` and other `SSE` instructions.
+
+
+- Compilers will catch up eventually and the performance gap with `C` will lessen
+- the touted "within 10% of C" doesn't hold (yet) for number crunching applications (more like a 2x against a "gcc -O3" binary)
+
+
+* Experience so far
+
+`Go` being relatively new, support for general purpose scientific libraries is scarce.
+
+
+The [[http://github.com/gonum][gonum]] community is working on that:
+
+- [[http://github.com/gonum/blas][gonum/blas]], a `go` based implementation of Basic Linear Algebra Subprograms
+- [[http://github.com/gonum/matrix][gonum/matrix]], to work with matrices
+- [[http://github.com/gonum/graph][gonum/graph]], to work with graphs
+- ...
+
+
+Plotting data is also rather easy:
+
+- [[https://code.google.com/p/plotinum/][plotinum]] (soon (?) to be migrated to [[http://github.com/gonum/plot][gonum/plot]])
+- [[http://github.com/sbinet/go-gnuplot][go-gnuplot]]
+
+
+* What's missing ?
+
+The `Go` scientific-oriented ecosystem is slowly bootstrapping itself.
+Other "communities" are gathering too:
+
+- Biology: [[https://code.google.com/p/biogo/][biogo]]
+- Chemistry: [[https://github.com/rmera/gochem][gochem]]
+
+So, what's missing ? (IMHO) not that much.
+
+- a dash of performances (but we are still light years ahead of `CPython`)
+- a critical mass
+
+the rest is/will-be history :)
+
+
+Nice to have to help spreading `go`:
+
+- ability to write _e.g._ `Python` extension modules in `Go`.
+- a `go` interpreter ? (see [[http://github.com/sbinet/igo][igo]])
+
