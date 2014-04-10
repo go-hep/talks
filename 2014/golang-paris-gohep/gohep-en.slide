@@ -106,7 +106,7 @@ Summing over all HEP software stack for e.g. ATLAS:
 - event generators: ~1.4M SLOC (C++, FORTRAN-77)
 - I/O libraries ~1.7M SLOC (C++)
 - simulation libraries ~1.2M SLOC (C++)
-- reconstruction framework ~5M SLOC (C++) + steering/configuration (~1M SLOC python) (want to have look at the [[http://acode-browser.usatlas.bnl.gov/lxr/source/][ATLAS code]] ?)
+- reconstruction framework ~5M SLOC (C++) + steering/configuration (~1M SLOC python) (want to have a look at the [[http://acode-browser.usatlas.bnl.gov/lxr/source/][ATLAS code]]? [[https://github.com/cms-sw/cmssw][CMS code]]?)
 
 
 
