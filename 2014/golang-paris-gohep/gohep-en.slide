@@ -54,7 +54,7 @@ A proton-proton collider of 27km of circonference.
 
 * High level view of the data pipeline
 
-Data is collected at one of 4 interaction points
+Data is collected at the 4 interaction points
 
 - collisions every 150 ns
 - ~1.6 Mb / collision
@@ -203,7 +203,7 @@ And even more so in the future:
 - installs easily (also 3rd-party packages: _"go_get"_)
 - fast to pick up, not as complicated as *C++*
 - builtin reflection system
-- builtin (un)serialization capabilities
+- builtin (de)serialization capabilities
 - concurrency support
 - garbage collected
 
