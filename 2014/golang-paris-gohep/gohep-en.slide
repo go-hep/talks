@@ -244,7 +244,7 @@ Wrapping `C++` libraries (via a C-shim) with `cgo` is ~OK
 
 No shared libraries.
 
-- plugin systems (heavily used in our reconstruction frameworks) uses shared libraries
+- plugins system (heavily used in our reconstruction frameworks) uses shared libraries
 - no, funneling data through some IPC won't fly (for our use case)
 - actually not a limitation: re-compile on the fly, fork-exec (and still faster than booting `Python` VM + loading shared libraries, plus you get a static binary)
 
