@@ -68,9 +68,9 @@ Raw data is then filtered to only keep "interesting" events (collisions of proto
 #Monte-Carlo techniques
 
 - *Generation:* production of a single physics event (_e.g.:_ a collision and its decay products)
-- *Simulation:* modelisation of the interactions b/w particles and detector material
+- *Simulation:* modelling interactions between particles and detector material
 - *Reconstruction:* building physics objects (electrons, photons, ...) from the detector signals (energy deposits)
-- *Analysis:* analyse reconstruction output(s) to test hypotheses
+- *Analysis:* testing hypotheses against the reconstruction output
 
 .image figs/schema-general-flux-all-en.png 300 300
 
@@ -91,7 +91,7 @@ Mid-90's: migration to *C++*
 Mid-2000's: *Python* gained tremendous mindshare 
 
 - first thru the steering of *C++* binaries
-- then as complete analyses glueing *C++* libraries together
+- then as complete analyses gluing *C++* libraries together
 
 
 * Software in HEP - some numbers
@@ -117,9 +117,9 @@ Summing over all HEP software stack for e.g. ATLAS:
 
 * People committing code to VCS per month
 
-Variety of skills
-Huge turn-around
-Once the physics data is pouring, people go doing physics instead of software
+Wide variety of skill level
+Large amount of churn
+Once the physics data is pouring, people go and do physics instead of software
 
 
 .image figs/cmssw-commits.png 400 600
@@ -236,7 +236,7 @@ So far:
 Wrapping `C++` libraries (via a C-shim) with `cgo` is ~OK
 
 - time consumming (no surprise)
-- like for `Python`, you don't want to cross language boundaries too frequently (perfs!)
+- as with `Python`, you don't want to cross language boundaries too frequently (perfs!)
 - using the `SWIG` support wasn't possible (because of some `C++` constructs not supported by `SWIG` 's parser)
 
 
@@ -322,8 +322,8 @@ Other "communities" are gathering too:
 
 So, what's missing ? (IMHO) not that much.
 
-- a dash of performances (but we are still light years ahead of `CPython`)
-- a critical mass
+- a dash of performance (but we are still light years ahead of `CPython`)
+- critical mass
 
 the rest is/will-be history :)
 
