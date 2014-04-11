@@ -72,7 +72,7 @@ Raw data is then filtered to only keep "interesting" events (collisions of proto
 - *Reconstruction:* building physics objects (electrons, photons, ...) from the detector signals (energy deposits)
 - *Analysis:* analyse reconstruction output(s) to test hypotheses
 
-.image figs/schema-general-flux-all.png 300 300
+.image figs/schema-general-flux-all-en.png 300 300
 
 #* 
 #
