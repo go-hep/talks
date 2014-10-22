@@ -445,3 +445,14 @@ Caveats:
 - proper persistency package (in the works: [[https://github.com/go-hep/rio][rio]])
 - display histograms
 - performance improvements (cpu-profiling via `go` `tool` `pprof`)
+
+- test with `CPUCruncher` and `AlgTimings` from `GaudiHive`: [[http://lcgapp.cern.ch/git/GaudiMT/tree/GaudiHive/options][here]]
+
+
+* Acknowledgements / resources
+
+.link http://talks.golang.org/2012/tutorial.slide
+
+.link http://talks.golang.org/2014/taste.slide
+
+.link http://tour.golang.org
