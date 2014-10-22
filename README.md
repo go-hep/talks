@@ -8,3 +8,5 @@ Talks can be viewed there:
 
 - [2014: golang-paris go in HEP](http://talks.godoc.org/github.com/go-hep/talks/2014/golang-paris-gohep/gohep-en.slide#1)
 
+- [2014: go-hep/fwk @ concurrency forum](http://talks.godoc.org/github.com/go-hep/talks/2014/20141022-binet-go-fwk-conc/go-fwk.slide#1)
+
