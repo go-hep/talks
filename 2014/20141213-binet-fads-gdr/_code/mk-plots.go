@@ -147,7 +147,7 @@ func do_linux_cpu() {
 	p.Legend.Add("naive-scaling", naive)
 
 	// save the plot
-	err = p.Save(4, 4, "linux-cpu.png")
+	err = p.Save(6, 4, "linux-cpu.png")
 	if err != nil {
 		panic(err)
 	}
@@ -184,7 +184,7 @@ func do_linux_hz() {
 	p.Legend.Add("naive-scaling", naive)
 
 	// save the plot
-	err = p.Save(4, 4, "linux-hz.png")
+	err = p.Save(6, 4, "linux-hz.png")
 	if err != nil {
 		panic(err)
 	}
@@ -218,7 +218,7 @@ func do_linux_rss() {
 	}
 
 	// save the plot
-	err = p.Save(4, 4, "linux-rss.png")
+	err = p.Save(6, 4, "linux-rss.png")
 	if err != nil {
 		panic(err)
 	}
