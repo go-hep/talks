@@ -1,0 +1,459 @@
+fwk: a Go-based concurrent control framework
+Concurrency forum, 2014/10/22
+
+Sebastien Binet
+CNRS/IN2P3
+
+
+* Go refresher
+
+* Go refresher
+
+[[https://golang.org][Go]] is a new, general-purpose programming language.
+
+- Compiled
+- Statically typed
+- Concurrent
+- Simple
+- Productive
+
+"Go is a wise, clean, insightful, fresh thinking approach to the greatest-hits subset of the well understood."
+- Michael T. Jones
+
+
+* History
+
+- Project starts at Google in 2007 (by Griesemer, Pike, Thompson)
+- Open source release in November 2009
+- More than 250 contributors join the project
+- Version 1.0 release in March 2012
+- Version 1.1 release in May 2013
+- Version 1.2 release in December 2013
+- Version 1.3 release in June 2014
+
+# Go was originally built by a team at Google, led by Robert Griesemer, Rob Pike, and Ken Thompson. In November 2010, Go was launched publically as an open source project. Since then, a team at Google and more than 250 contributors from the open source community continued to improve the Go language, libraries, and tools.
+
+# In March 2012, we announced Go 1, a version of the language and libraries that will be supported for years to come. 
+
+* Elements of Go
+
+- Founding fathers: Russ Cox, Robert Griesemer, Ian Lance Taylor, Rob Pike, Ken Thompson
+
+
+- Concurrent, garbage-collected
+- An Open-source general progamming language (BSD-3)
+- feel of a *dynamic* *language*: limited verbosity thanks to the _type_ _inference_ _system_, map, slices
+- safety of a *static* *type* *system*
+- compiled down to machine language (so it is fast, goal is ~10% of C)
+- *object-oriented* but w/o classes, *builtin* *reflection*
+- first-class functions with *closures*
+- implicitly satisfied *interfaces*
+
+* Elements of Go - II
+
+- available on MacOSX, Linux, Windows,... x86, x64, ARM.
+- available on _lxplus_:
+
+  $ ssh lxplus
+  [...]
+  * LXPLUS Public Login Service
+  * 2014-09-23 - expect installed
+  * 2014-10-02 - golang (Go Language) installed
+  * ********************************************************************
+
+  $ /usr/bin/go version
+  go version go1.2.2 linux/amd64
+
+  $ . /afs/cern.ch/sw/lcg/contrib/go/1.3/linux_amd64/setup.sh
+  $ go version
+  go version go1.3 linux/amd64
+
+* Concurrency
+
+* Goroutines
+
+- The _go_ statement launches a function call as a goroutine
+	go f()
+	go f(x, y, ...)
+
+- A goroutine runs concurrently (but not necessarily in parallel)
+- A goroutine has its own (growable/shrinkable) stack
+
+
+* A simple example
+
+.code _code/concurrency1.go /f START/,/f END/
+
+Function f is launched as 3 different goroutines, all running concurrently:
+
+.play _code/concurrency1.go /main START/,/main END/
+
+
+* Communication via channels
+
+A channel type specifies a channel value type (and possibly a communication direction):
+
+	chan int
+	chan<- string  // send-only channel
+	<-chan T       // receive-only channel
+
+A channel is a variable of channel type:
+
+	var ch chan int
+	ch := make(chan int)  // declare and initialize with newly made channel
+
+A channel permits _sending_ and _receiving_ values:
+
+	ch <- 1   // send value 1 on channel ch
+	x = <-ch  // receive a value from channel ch (and assign to x)
+
+Channel operations synchronize the communicating goroutines.
+
+* Communicating goroutines
+
+Each goroutine sends its results via channel ch:
+
+.code _code/concurrency2.go /f START/,/f END/
+
+The main goroutine receives (and prints) all results from the same channel:
+
+.play _code/concurrency2.go /main START/,/main END/
+
+
+* Non-elements of Go
+
+- *no* dynamic libraries
+- *no* dynamic loading (scheduled for `go-1.5`)
+- *no* templates nor generics (maybe for `go-2.0`)
+- *no* operator overloading
+
+
+* go-hep/fwk
+
+* go-hep/fwk
+
+[[https://github.com/go-hep/fwk][fwk]] is a Go-based concurrent control framework inspired from:
+
+- GaudiHive
+- ILC Marlin
+- CMSSW
+- previous incarnations of _fwk_ (_go-ng-gaudi_, _go-gaudi_)
+
+Code is on github (BSD-3):
+
+.link https://github.com/go-hep/fwk
+
+Documentation is served by [[https://godoc.org][godoc.org]]:
+
+.link https://godoc.org/github.com/go-hep/fwk
+
+CI-tests are served by [[https://drone.io][drone.io]]:
+
+.link https://drone.io/github.com/go-hep/fwk/latest
+
+
+* go-hep/fwk - Installation
+
+As easy as:
+
+  $ export GOPATH=$HOME/dev/gocode
+  $ export PATH=$GOPATH/bin:$PATH
+  
+  $ go get github.com/go-hep/fwk/...
+
+Yes, with the ellipsis at the end, to also install sub-packages.
+
+
+* go-hep/fwk - Examples
+
+
+  $ fwk-ex-tuto-1 -help
+  Usage: fwk-ex-tuto1 [options]
+  
+  ex:
+   $ fwk-ex-tuto-1 -l=INFO -evtmax=-1
+  
+  options:
+    -evtmax=10: number of events to process
+    -l="INFO": message level (DEBUG|INFO|WARN|ERROR)
+    -nprocs=0: number of events to process concurrently
+
+Runs 2 tasks.
+
+#- task 1 stores 2 `int`s under `"t1-ints1"` and `"t2-ints2"`.
+#- task 2 retrieves `"t1-ints1"` and stores `"t1-ints1-massaged"`
+
+.image _figs/fwk-ex1-dflow.png 200 200
+
+* go-hep/fwk - Examples
+
+  $ fwk-ex-tuto-1
+  ::: fwk-ex-tuto-1...
+  t2                   INFO configure...
+  t2                   INFO configure... [done]
+  t1                   INFO configure ...
+  t1                   INFO configure ... [done]
+  t2                   INFO start...
+  t1                   INFO start...
+  app                  INFO >>> running evt=0...
+  t1                   INFO proc... (id=0|0) => [10, 20]
+  t2                   INFO proc... (id=0|0) => [10 -> 100]
+  [...]
+  app                  INFO >>> running evt=9...
+  t1                   INFO proc... (id=9|0) => [10, 20]
+  t2                   INFO proc... (id=9|0) => [10 -> 100]
+  t2                   INFO stop...
+  t1                   INFO stop...
+  app                  INFO cpu: 654.064us
+  app                  INFO mem: alloc:             62 kB
+  app                  INFO mem: tot-alloc:         74 kB
+  app                  INFO mem: n-mallocs:        407
+  app                  INFO mem: n-frees:           60
+  app                  INFO mem: gc-pauses:          0 ms
+  ::: fwk-ex-tuto-1... [done] (cpu=788.578us)
+
+
+* go-hep/fwk - Components
+
+A _fwk_ application consists of a set of components (_fwk.Task_) which are:
+- (optionally) configured
+- started
+- given the chance to process each event
+- stopped
+
+Helper components (_fwk.Svc_) can provide additional features (such as a whiteboard/event-store service, a data-flow service, ...) but do not typically take (directly) part of the event processing.
+
+There are no _Gaudi_ equivalent of _AlgTools_.
+
+* go-hep/fwk - Interfaces
+
+  // Component is the interface satisfied by all values in fwk.
+  //
+  // A component can be asked for:
+  // its Type() (ex: "github.com/go-hep/fads.MomentumSmearing")
+  // its Name() (ex: "MuonsMomSmearing")
+  type Component interface {
+  	Type() string // Type of the component (ex: "github.com/go-hep/fads.MomentumSmearing")
+  	Name() string // Name of the component (ex: "MuonsMomSmearing")
+  }
+
+_Tasks_ (and _Services_) are called with a _Context_ argument to enable concurrency/parallelism.
+
+  // Task is a component processing event-level data.
+  // Task.Process is called for every component and for every input event.
+  type Task interface {
+  	Component
+  
+  	StartTask(ctx Context) error
+  	Process(ctx Context) error
+  	StopTask(ctx Context) error
+  }
+
+
+* go-hep/fwk - Interfaces
+
+  // Context is the interface to access context-local data.
+  type Context interface {
+  	ID() int64      // id of this context (e.g. entry number or some kind of event number)
+  	Slot() int      // slot number in the pool of event sequences
+  	Store() Store   // data store corresponding to the id+slot
+  	Msg() MsgStream // messaging for this context (id+slot)
+  
+  	Svc(n string) (Svc, error) // retrieve an already existing Svc by name
+  }
+
+_Context_ is a bit of a grab bag of what needs to be available/queried during event processing.
+
+- _Msg()_ allows to relieve pressure on the I/O system. Eventually, should allow to have human-readable log files even with many events in-flight.
+
+- similarly, _Store()_ and _Svc()_ allow to have event-level local state.
+
+* go-hep/fwk - Interfaces
+
+  // DeclPorter is the interface to declare input/output ports for the data flow.
+  type DeclPorter interface {
+  	DeclInPort(name string, t reflect.Type) error
+  	DeclOutPort(name string, t reflect.Type) error
+  }
+
+- Note there is no _update_ nor _R/W_ ports: simplifies the data flow, make it more *functional-like*,
+- Updates handled by copying input data under a new event store key,
+- _dflowsvc_ detects (long-range) cycles and missing data-nodes.
+
+Example:
+
+.code _code/task1_configure.go /configure START/,/configure END/ HLxxx
+
+* go-hep/fwk - Interfaces
+
+  // Store provides access to a concurrent-safe map[string]interface{} store.
+  type Store interface {
+  	Get(key string) (interface{}, error)
+  	Put(key string, value interface{}) error
+  	Has(key string) bool
+  }
+
+Examples:
+
+.code _code/task2_process.go HLxxx
+
+* go-hep/fwk - appmgr
+
+.code _code/appmgr.go HLxxx
+
+- run sequentially
+- run _N_ workers, each worker processing events as they become available
+- all tasks are started at the beginning of the event processing, letting the dataflow works its magic
+
+* go-hep/fwk - workers
+
+.code _code/worker.go HLxxx
+
+- each worker manages its own event store
+- each worker manages contexts for each component it runs
+
+* go-hep/fwk - workers
+
+[[https://github.com/go-hep/fwk][fwk]] enables:
+- event-level concurrency
+- tasks-level concurrency
+
+[[https://github.com/go-hep/fwk][fwk]] relies on [[https://golang.org][Go]]'s runtime to properly schedule _goroutines_.
+
+For sub-task concurrency, users are by construction required to use [[https://golang.org][Go]]'s constructs (_goroutines_ and _channels_) so everything is consistent *and* the _runtime_ has the *complete* *picture*.
+
+- *Note:* [[https://golang.org][Go]]'s runtime isn't yet _NUMA-aware_. A proposal for _Go-1.5_ _(June-2015)_ is in the [[https://docs.google.com/document/d/1d3iI2QWURgDIsSR6G2275vMeQ_X7w-qxM2Vp7iGwwuM/pub][works]].
+
+
+* go-hep/fwk - configuration & steering
+
+- use regular [[https://golang.org][Go]] to configure and steer.
+- still on the fence on a DSL-based configuration language (`YAML`, `HCL`, `Toml`, ...)
+- probably *not* `Python` though
+
+  // job is the scripting interface to 'fwk'
+  import "github.com/go-hep/fwk/job"
+
+  func main() {
+  	// create a default fwk application, with some properties
+  	app := job.New(job.P{
+  		"EvtMax":   10,
+  		"NProcs":   2,
+  	})
+  	
+  	// ... cont'd on next page...
+
+* go-hep/fwk - configuration & steering
+
+  	// create a task that reads integers from some location
+  	// and publish the square of these integers under some other location
+  	app.Create(job.C{
+  		Type: "github.com/go-hep/fwk/testdata.task2",
+  		Name: "t2",
+  		Props: job.P{
+  			"Input":  "t1-ints1",
+  			"Output": "t1-ints1-massaged",
+  		},
+  	})
+  	// create a task that publish integers to some location(s)
+  	// create after the consummer task to exercize the automatic data-flow scheduling.
+  	app.Create(job.C{
+  		Type: "github.com/go-hep/fwk/testdata.task1",
+  		Name: "t1",
+  		Props: job.P{
+  			"Ints1": "t1-ints1",
+  			"Ints2": "t2-ints2",
+  			"Int1":  int64(10), // initial value for the Ints1
+  			"Int2":  int64(20), // initial value for the Ints2
+  		},
+  	})
+  	app.Run()
+
+* go-hep/fads - real world use case
+
+- translated [[https://cp3.irmp.ucl.ac.be/projects/delphes][C++-Delphes]] into Go
+- [[https://github.com/go-hep/fads][go-hep/fads]]: Fast Detector Simulation for HEP.
+- installation:
+
+  $ go get github.com/go-hep/fads/...
+  $ fads-app -help
+  Usage: fads-app [options] <hepmc-input-file>
+  
+  ex:
+   $ fads-app -l=INFO -evtmax=-1 ./testdata/hepmc.data
+  
+  options:
+    -cpu-prof=false: enable CPU profiling
+    -evtmax=-1: number of events to process
+    -l="INFO": log level (DEBUG|INFO|WARN|ERROR)
+    -nprocs=0: number of concurrent events to process
+
+* go-hep/fads - components
+
+- a `HepMC` converter
+- particle propagator
+- calorimeter simulator
+- energy rescaler, momentum smearer
+- isolation
+- b-tagging, tau-tagging
+- jet-finder (reimplementation of FastJet in Go: [[https://github.com/go-hep/fastjet][go-hep/fastjet]])
+- histogram service (from [[https://github.com/go-hep/fwk][go-hep/fwk]])
+
+Caveats:
+
+- no real persistency to speak of (_i.e.:_ `JSON`, `ASCII` and `Gob`)
+- jet clustering limited to N^3 (slowest and dumbest scheme of `C++-FastJet`)
+
+
+* 
+
+
+.image _figs/fads-dflow.png 600 600
+
+
+* Results
+
+- Linux: Intel(R) Core(TM)2 Duo CPU @ 2.53GHz, 4GB RAM, 2 cores
+- Linux: Intel(R) Xeon(R) CPU E5-2660 v2 @ 2.20GHz, 40 cores
+- MacOSX-10.6: Intel(R) Xeon(R) CPU @ 2.27GHz, 172GB RAM, 16 cores
+
+* Linux testbench (CPU)
+
+.image _figs/linux-cpu.png
+
+* Linux testbench (RSS)
+
+.image _figs/linux-rss.png
+
+
+* MacOSX testbench (CPU)
+
+.image _figs/darwin-cpu.png
+
+* MacOSX testbench (RSS)
+
+.image _figs/darwin-rss.png
+
+
+* Results
+
+- good RSS scaling (wrt `Delphes` and `multi-process`)
+- good CPU scaling (wrt `multi-process`)
+- OK-ish CPU performances wrt `Delphes`
+
+* Prospects
+
+- proper persistency package (in the works: [[https://github.com/go-hep/rio][rio]])
+- display histograms
+- performance improvements (cpu-profiling via `go` `tool` `pprof`)
+
+- test with `CPUCruncher` and `AlgTimings` from `GaudiHive`: [[http://lcgapp.cern.ch/git/GaudiMT/tree/GaudiHive/options][here]]
+
+
+* Acknowledgements / resources
+
+.link http://talks.golang.org/2012/tutorial.slide
+
+.link http://talks.golang.org/2014/taste.slide
+
+.link http://tour.golang.org
