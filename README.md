@@ -10,5 +10,5 @@ Talks can be viewed there:
 
 - [2014: go-hep/fwk @ concurrency forum](http://talks.godoc.org/github.com/go-hep/talks/2014/20141022-binet-go-fwk-conc/go-fwk.slide#1)
 
-- [2014: go-hep/fads @ GdR Terascale](http://talks.godoc.org/github.com/go-hep/talks/2014/20141213-binet-go-fads-gdr/go-fads.slide#1)
+- [2014: go-hep/fads @ GdR Terascale](http://talks.godoc.org/github.com/go-hep/talks/2014/20141213-binet-fads-gdr/go-fads.slide#1)
 
