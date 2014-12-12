@@ -1,13 +1,181 @@
-fwk: a Go-based concurrent control framework
-Concurrency forum, 2014/10/22
+fads: a FAst Detector Simulation toolkit
+GdR Terascale, 2014/12/13
 
 Sebastien Binet
 CNRS/IN2P3
 
+* (a brief) History of software in HEP
 
-* Go refresher
+* 50's-90's: FORTRAN77
 
-* Go refresher
+.code _code/hello.f
+
+ $ gfortran -c hello.f && gfortran -o hello hello.o
+ $ ./hello
+ Hello from FORTRAN
+
+- `FORTRAN77` is the *king*
+- 1964: *CERNLIB*
+- REAP (paper tape measurements), THRESH (geometry reconstruction)
+- SUMX, *HBOOK* (statistical analysis chain)
+- ZEBRA (memory management, I/O, ...)
+- GEANT3, *PAW*
+
+* 90's-...: C++
+
+.code _code/hello.cxx
+
+ $ c++ -o hello hello.cxx && ./hello
+ Hello from C++
+ 
+.image _figs/my-root6splash.png 190 190
+
+- object-oriented programming (OOP) is the cool kid on the block
+- *ROOT*, POOL, LHC++, AIDA, *Geant4*
+- `C++` takes roots in HEP
+
+* 00's-...: python
+
+.code _code/hello.py
+
+ $ python ./hello.py
+ Hello from python
+ 
+.image _figs/my-python-logo.png 100 250
+
+- `python` becomes the _de_ _facto_ scripting language in HEP
+- framework data-cards
+- analysis glue, (whole) analyses in `python`
+- *PyROOT*, rootpy
+- numpy, scipy, *IPython*, matplotlib
+
+* Current software in a nutshell
+
+- *Generators*: generation of true particles from fondamental physics first principles
+- *Full* *Simulation*: tracking of all stable particles in magnetic field through the detector simulating interaction, recording energy deposition (*CPU* *intensive*)
+- *Reconstruction*: from real data, or from `Monte-Carlo` simulation data as above
+- *Fast* *Simulation*: parametric simulation, faster, coarser
+- *Analysis*: daily work of physicists, running on output of reconstruction to derive analysis specific information (*I/O* *intensive*)
+- everything in the same `C++` offline control framework (except analysis)
+
+.image _figs/data-flux-summary-all.png 210 800
+
+
+* 
+
+- `C++`: *slow* (very slow?) to compile/develop, *fast* to execute
+- `python`: *fast* development cycle (no compilation), *slow* to execute
+# (can be mitigated if leveraging/rewriting(parts in) `C++`. more work)
+
+.image _figs/xkcd-compiling.png 400 400
+
+Are those our only options ?
+
+
+* Moore's law
+
+.image _figs/cpu-free-lunch.png 550 550
+
+* Moore's law
+
+- Moore's law still observed at the hardware level
+- *However* the _effective_ perceived computing power is mitigated
+
+_"Easy_ _life"_ during the last 20-30 years:
+
+- Moore's law transleted into *doubling* compute capacity every ~18 months (_via_ clock frequency)
+- *Concurrency* and *parallelism* necessary to efficiently harness the compute power of our new multi-core CPU architectures.
+
+_But_ our current software isn't prepared for parallel/concurrent environments.
+
+
+* Interlude: concurrency & parallelism
+
+* Interlude: concurrency & parallelism
+
+- *Concurrency* is about _dealing_ with lots of things at once.
+- *Parallelism* is about _doing_ lots of things at once.
+- Not the same, but related.
+- Concurrency is about _structure_, parallelism is about _execution_.
+
+.image _figs/conc-para.png 200 600
+
+Concurrency is a way to structure a program by breaking it into pieces that can be executed independently.
+Communication is the means to coordinate the independent executions.
+
+* Concurrency in HEP software
+
+.image _figs/conc-level.png 600 400
+
+* Concurrency in HEP software - II
+
+.image _figs/levels-of-conc.png
+
+# Graal of concurrent software:
+
+.image _figs/gaudi-hive-2.png 250 350
+
+* 
+
+.image _figs/conc-para-mt-mp.png 600 1000
+
+
+* Multi-processing
+
+Launch _N_ instances of an application on a node with _N_ cores
+
+- re-use pre-existing code
+- _a_ _priori_ no required modification of pre-existing code
+- satisfactory _scalability_ with the number of cores
+
+*But:*
+
+- resource requirements increase with the number of processes
+- memory footprint *increases*
+- as do other O/S (limited) resources (file descriptors, network sockets, ...)
+- scalability of *I/O* debatable when number of cores > ~100
+
+
+* Multi-threading
+
+.image _figs/mt-cxx.png
+
+`C++11/14` libraries do help a bit:
+- `std::lambda`, `std::thread`, `std::promise`
+- (Intel) Threading Building Blocks
+- ...
+
+* Time for a new language ?
+
+.image _figs/new-lang.png 600 800
+
+* Candidates
+
+- python/pypy
+- FORTRAN-2008
+- Vala
+- Swift
+- Rust
+- Go
+- Chapel
+- Scala
+- Haskell
+- Clojure
+
+* Why not Go ?
+
+# .image _figs/hello-go.png 600 900
+
+.code _code/hello.go
+
+ $ go run hello.go
+ Hello from Go
+
+A nice language with a nice mascot.
+
+.image _figs/golang-logo.png 200 400
+
+* Go in a nutshell
 
 [[https://golang.org][Go]] is a new, general-purpose programming language.
 
@@ -30,6 +198,7 @@ CNRS/IN2P3
 - Version 1.1 release in May 2013
 - Version 1.2 release in December 2013
 - Version 1.3 release in June 2014
+- Version 1.4 release in December 2014 (last Thursday)
 
 # Go was originally built by a team at Google, led by Robert Griesemer, Rob Pike, and Ken Thompson. In November 2010, Go was launched publically as an open source project. Since then, a team at Google and more than 250 contributors from the open source community continued to improve the Go language, libraries, and tools.
 
@@ -120,48 +289,46 @@ The main goroutine receives (and prints) all results from the same channel:
 .play _code/concurrency2.go /main START/,/main END/
 
 
-* Non-elements of Go
+# * Non-elements of Go
 
-- *no* dynamic libraries
-- *no* dynamic loading (scheduled for `go-1.5`)
-- *no* templates nor generics (maybe for `go-2.0`)
-- *no* operator overloading
+# - *no* dynamic libraries
+# - *no* dynamic loading (scheduled for `go-1.5`)
+# - *no* templates nor generics (maybe for `go-2.0`)
+# - *no* operator overloading
 
 
-* go-hep/fwk
+* fads
 
-* go-hep/fwk
+* fads
 
-[[https://github.com/go-hep/fwk][fwk]] is a Go-based concurrent control framework inspired from:
+`fads` is a "FAst Detector Simulation" toolkit.
 
-- GaudiHive
-- ILC Marlin
-- CMSSW
-- previous incarnations of _fwk_ (_go-ng-gaudi_, _go-gaudi_)
+- morally a translation of [[https://cp3.irmp.ucl.ac.be/projects/delphes][C++-Delphes]] into Go
+- uses [[https://github.com/go-hep/fwk][go-hep/fwk]] to expose, manage and harness concurrency into the usual `HEP` event loop (`initialize` | `process-events` | `finalize`)
+- uses [[https://github.com/go-hep/hbook][go-hep/hbook]] for histogramming, [[htpps://github.com/go-hep/hepmc][go-hep/hepmc]] for `HepMC` input/output
 
 Code is on github (BSD-3):
 
 .link https://github.com/go-hep/fwk
+.link https://github.com/go-hep/fads
 
 Documentation is served by [[https://godoc.org][godoc.org]]:
 
 .link https://godoc.org/github.com/go-hep/fwk
+.link https://godoc.org/github.com/go-hep/fads
 
-CI-tests are served by [[https://drone.io][drone.io]]:
-
-.link https://drone.io/github.com/go-hep/fwk/latest
-
-
-* go-hep/fwk - Installation
+* go-hep/fads - Installation
 
 As easy as:
 
   $ export GOPATH=$HOME/dev/gocode
   $ export PATH=$GOPATH/bin:$PATH
   
-  $ go get github.com/go-hep/fwk/...
+  $ go get github.com/go-hep/fads/...
 
 Yes, with the ellipsis at the end, to also install sub-packages.
+
+- `go` `get` will recursively download and install the all packages that [[https://github.com/go-hep/fads][go-hep/fads]] depends on. (no `Makefile` needed)
 
 
 * go-hep/fwk - Examples
@@ -213,106 +380,7 @@ Runs 2 tasks.
   ::: fwk-ex-tuto-1... [done] (cpu=788.578us)
 
 
-* go-hep/fwk - Components
-
-A _fwk_ application consists of a set of components (_fwk.Task_) which are:
-- (optionally) configured
-- started
-- given the chance to process each event
-- stopped
-
-Helper components (_fwk.Svc_) can provide additional features (such as a whiteboard/event-store service, a data-flow service, ...) but do not typically take (directly) part of the event processing.
-
-There are no _Gaudi_ equivalent of _AlgTools_.
-
-* go-hep/fwk - Interfaces
-
-  // Component is the interface satisfied by all values in fwk.
-  //
-  // A component can be asked for:
-  // its Type() (ex: "github.com/go-hep/fads.MomentumSmearing")
-  // its Name() (ex: "MuonsMomSmearing")
-  type Component interface {
-  	Type() string // Type of the component (ex: "github.com/go-hep/fads.MomentumSmearing")
-  	Name() string // Name of the component (ex: "MuonsMomSmearing")
-  }
-
-_Tasks_ (and _Services_) are called with a _Context_ argument to enable concurrency/parallelism.
-
-  // Task is a component processing event-level data.
-  // Task.Process is called for every component and for every input event.
-  type Task interface {
-  	Component
-  
-  	StartTask(ctx Context) error
-  	Process(ctx Context) error
-  	StopTask(ctx Context) error
-  }
-
-
-* go-hep/fwk - Interfaces
-
-  // Context is the interface to access context-local data.
-  type Context interface {
-  	ID() int64      // id of this context (e.g. entry number or some kind of event number)
-  	Slot() int      // slot number in the pool of event sequences
-  	Store() Store   // data store corresponding to the id+slot
-  	Msg() MsgStream // messaging for this context (id+slot)
-  
-  	Svc(n string) (Svc, error) // retrieve an already existing Svc by name
-  }
-
-_Context_ is a bit of a grab bag of what needs to be available/queried during event processing.
-
-- _Msg()_ allows to relieve pressure on the I/O system. Eventually, should allow to have human-readable log files even with many events in-flight.
-
-- similarly, _Store()_ and _Svc()_ allow to have event-level local state.
-
-* go-hep/fwk - Interfaces
-
-  // DeclPorter is the interface to declare input/output ports for the data flow.
-  type DeclPorter interface {
-  	DeclInPort(name string, t reflect.Type) error
-  	DeclOutPort(name string, t reflect.Type) error
-  }
-
-- Note there is no _update_ nor _R/W_ ports: simplifies the data flow, make it more *functional-like*,
-- Updates handled by copying input data under a new event store key,
-- _dflowsvc_ detects (long-range) cycles and missing data-nodes.
-
-Example:
-
-.code _code/task1_configure.go /configure START/,/configure END/ HLxxx
-
-* go-hep/fwk - Interfaces
-
-  // Store provides access to a concurrent-safe map[string]interface{} store.
-  type Store interface {
-  	Get(key string) (interface{}, error)
-  	Put(key string, value interface{}) error
-  	Has(key string) bool
-  }
-
-Examples:
-
-.code _code/task2_process.go HLxxx
-
-* go-hep/fwk - appmgr
-
-.code _code/appmgr.go HLxxx
-
-- run sequentially
-- run _N_ workers, each worker processing events as they become available
-- all tasks are started at the beginning of the event processing, letting the dataflow works its magic
-
-* go-hep/fwk - workers
-
-.code _code/worker.go HLxxx
-
-- each worker manages its own event store
-- each worker manages contexts for each component it runs
-
-* go-hep/fwk - workers
+* go-hep/fwk - Concurrency
 
 [[https://github.com/go-hep/fwk][fwk]] enables:
 - event-level concurrency
@@ -324,6 +392,106 @@ For sub-task concurrency, users are by construction required to use [[https://go
 
 - *Note:* [[https://golang.org][Go]]'s runtime isn't yet _NUMA-aware_. A proposal for _Go-1.5_ _(June-2015)_ is in the [[https://docs.google.com/document/d/1d3iI2QWURgDIsSR6G2275vMeQ_X7w-qxM2Vp7iGwwuM/pub][works]].
 
+
+* go-hep/fads - real world use case
+
+- translated [[https://cp3.irmp.ucl.ac.be/projects/delphes][C++-Delphes]]' ATLAS data-card into Go
+- [[https://github.com/go-hep/fads/blob/master/cmd/fads-app/main.go][go-hep/fads-app]]
+- installation:
+
+  $ go get github.com/go-hep/fads/cmd/fads-app
+  $ fads-app -help
+  Usage: fads-app [options] <hepmc-input-file>
+  
+  ex:
+   $ fads-app -l=INFO -evtmax=-1 ./testdata/hepmc.data
+  
+  options:
+    -cpu-prof=false: enable CPU profiling
+    -evtmax=-1: number of events to process
+    -l="INFO": log level (DEBUG|INFO|WARN|ERROR)
+    -nprocs=0: number of concurrent events to process
+
+* go-hep/fads - components
+
+- a `HepMC` converter
+- particle propagator
+- calorimeter simulator
+- energy rescaler, momentum smearer
+- isolation
+- b-tagging, tau-tagging
+- jet-finder (reimplementation of FastJet in Go: [[https://github.com/go-hep/fastjet][go-hep/fastjet]])
+- histogram service (from [[https://github.com/go-hep/fwk][go-hep/fwk]])
+
+Caveats:
+
+- no real persistency to speak of (_i.e.:_ `JSON`, `ASCII` and `Gob`)
+- jet clustering limited to N^3 (slowest and dumbest scheme of `C++-FastJet`)
+
+
+* 
+
+
+.image _figs/fads-dflow.png 600 600
+
+
+* Results
+
+- Linux: Intel(R) Core(TM)2 Duo CPU @ 2.53GHz, 4GB RAM, 2 cores
+- MacOSX-10.6: Intel(R) Xeon(R) CPU @ 2.27GHz, 172GB RAM, 16 cores
+- Linux: Intel(R) Xeon(R) CPU E5-2660 v2 @ 2.20GHz, 40 cores
+
+* Linux (40 cores) testbench: memory
+
+.image _figs/lhcb3-rss.png 550 800
+
+* Linux (40 cores) testbench: CPU
+
+.image _figs/lhcb3-cpu.png 550 800
+
+* Linux (40 cores) testbench: event throughput
+
+.image _figs/lhcb3-hz.png 550 800
+
+
+* Results & Conclusions
+
+- good RSS scaling
+- good CPU scaling
+
+- bit-by-bit matching physics results wrt `Delphes` (up to calorimetry)
+
+Also addresses `C++` and `python` deficiencies:
+
+- code distribution
+- code installation
+- compilation/development speed
+- runtime speed
+- simple language
+
+* Prospects
+
+- proper persistency package (in the works: [[https://github.com/go-hep/rio][go-hep/rio]])
+- histograms (persistency) + n-tuples (interactivity): [[https://github.com/go-hep/hbook][go-hep/hbook]]
+- performance improvements (cpu-profiling via `go` `tool` `pprof`)
+- implement more of `go-fastjet` combination schemes and strategies
+- more end-user oriented documentation
+
+Join the fun: [[https://groups.google.com/d/forum/go-hep][go-hep forum]]
+
+
+* Acknowledgements / resources
+
+.link http://talks.golang.org/2012/tutorial.slide
+
+.link http://talks.golang.org/2014/taste.slide
+
+.link http://tour.golang.org
+
+* That's all !
+
+
+* Backup
 
 * go-hep/fwk - configuration & steering
 
@@ -369,91 +537,3 @@ For sub-task concurrency, users are by construction required to use [[https://go
   	})
   	app.Run()
 
-* go-hep/fads - real world use case
-
-- translated [[https://cp3.irmp.ucl.ac.be/projects/delphes][C++-Delphes]] into Go
-- [[https://github.com/go-hep/fads][go-hep/fads]]: Fast Detector Simulation for HEP.
-- installation:
-
-  $ go get github.com/go-hep/fads/...
-  $ fads-app -help
-  Usage: fads-app [options] <hepmc-input-file>
-  
-  ex:
-   $ fads-app -l=INFO -evtmax=-1 ./testdata/hepmc.data
-  
-  options:
-    -cpu-prof=false: enable CPU profiling
-    -evtmax=-1: number of events to process
-    -l="INFO": log level (DEBUG|INFO|WARN|ERROR)
-    -nprocs=0: number of concurrent events to process
-
-* go-hep/fads - components
-
-- a `HepMC` converter
-- particle propagator
-- calorimeter simulator
-- energy rescaler, momentum smearer
-- isolation
-- b-tagging, tau-tagging
-- jet-finder (reimplementation of FastJet in Go: [[https://github.com/go-hep/fastjet][go-hep/fastjet]])
-- histogram service (from [[https://github.com/go-hep/fwk][go-hep/fwk]])
-
-Caveats:
-
-- no real persistency to speak of (_i.e.:_ `JSON`, `ASCII` and `Gob`)
-- jet clustering limited to N^3 (slowest and dumbest scheme of `C++-FastJet`)
-
-
-* 
-
-
-.image _figs/fads-dflow.png 600 600
-
-
-* Results
-
-- Linux: Intel(R) Core(TM)2 Duo CPU @ 2.53GHz, 4GB RAM, 2 cores
-- Linux: Intel(R) Xeon(R) CPU E5-2660 v2 @ 2.20GHz, 40 cores
-- MacOSX-10.6: Intel(R) Xeon(R) CPU @ 2.27GHz, 172GB RAM, 16 cores
-
-* Linux testbench (CPU)
-
-.image _figs/linux-cpu.png
-
-* Linux testbench (RSS)
-
-.image _figs/linux-rss.png
-
-
-* MacOSX testbench (CPU)
-
-.image _figs/darwin-cpu.png
-
-* MacOSX testbench (RSS)
-
-.image _figs/darwin-rss.png
-
-
-* Results
-
-- good RSS scaling (wrt `Delphes` and `multi-process`)
-- good CPU scaling (wrt `multi-process`)
-- OK-ish CPU performances wrt `Delphes`
-
-* Prospects
-
-- proper persistency package (in the works: [[https://github.com/go-hep/rio][rio]])
-- display histograms
-- performance improvements (cpu-profiling via `go` `tool` `pprof`)
-
-- test with `CPUCruncher` and `AlgTimings` from `GaudiHive`: [[http://lcgapp.cern.ch/git/GaudiMT/tree/GaudiHive/options][here]]
-
-
-* Acknowledgements / resources
-
-.link http://talks.golang.org/2012/tutorial.slide
-
-.link http://talks.golang.org/2014/taste.slide
-
-.link http://tour.golang.org

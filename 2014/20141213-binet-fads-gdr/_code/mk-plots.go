@@ -102,13 +102,13 @@ func main() {
 		delphes: delphes,
 	}
 
-	do_linux_cpu()
-	do_linux_hz()
-	do_linux_rss()
+	do_linux_cpu("lhcb3")
+	do_linux_hz("lhcb3")
+	do_linux_rss("lhcb3")
 
 }
 
-func do_linux_cpu() {
+func do_linux_cpu(name string) {
 	// Make a plot
 	p, err := plot.New()
 	if err != nil {
@@ -147,14 +147,14 @@ func do_linux_cpu() {
 	p.Legend.Add("naive-scaling", naive)
 
 	// save the plot
-	err = p.Save(6, 4, "linux-cpu.png")
+	err = p.Save(6, 4, fmt.Sprintf("%s-cpu.pdf", name))
 	if err != nil {
 		panic(err)
 	}
 	return
 }
 
-func do_linux_hz() {
+func do_linux_hz(name string) {
 	// Make a plot
 	p, err := plot.New()
 	if err != nil {
@@ -184,14 +184,14 @@ func do_linux_hz() {
 	p.Legend.Add("naive-scaling", naive)
 
 	// save the plot
-	err = p.Save(6, 4, "linux-hz.png")
+	err = p.Save(6, 4, fmt.Sprintf("%s-hz.pdf", name))
 	if err != nil {
 		panic(err)
 	}
 	return
 }
 
-func do_linux_rss() {
+func do_linux_rss(name string) {
 	// Make a plot
 	p, err := plot.New()
 	if err != nil {
@@ -218,7 +218,7 @@ func do_linux_rss() {
 	}
 
 	// save the plot
-	err = p.Save(6, 4, "linux-rss.png")
+	err = p.Save(6, 4, fmt.Sprintf("%s-rss.pdf", name))
 	if err != nil {
 		panic(err)
 	}
