@@ -328,7 +328,7 @@ As easy as:
 
 Yes, with the ellipsis at the end, to also install sub-packages.
 
-- `go` `get` will recursively download and install the all packages that [[https://github.com/go-hep/fads][go-hep/fads]] depends on. (no `Makefile` needed)
+- `go` `get` will recursively download and install all the packages that [[https://github.com/go-hep/fads][go-hep/fads]] depends on. (no `Makefile` needed)
 
 
 * go-hep/fwk - Examples
