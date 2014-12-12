@@ -435,7 +435,7 @@ Caveats:
 .image _figs/fads-dflow.png 600 600
 
 
-* Results
+* Results - testbenches
 
 - Linux: Intel(R) Core(TM)2 Duo CPU @ 2.53GHz, 4GB RAM, 2 cores
 - MacOSX-10.6: Intel(R) Xeon(R) CPU @ 2.27GHz, 172GB RAM, 16 cores
