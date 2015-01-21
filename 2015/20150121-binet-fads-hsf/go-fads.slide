@@ -1,0 +1,163 @@
+fads: a (Go-based) FAst Detector Simulation toolkit
+HSF, 2015/01/21
+
+Sebastien Binet
+CNRS/IN2P3
+
+
+* fads
+
+`fads` is a "FAst Detector Simulation" toolkit.
+
+- morally a translation of [[https://cp3.irmp.ucl.ac.be/projects/delphes][C++-Delphes]] into [[https://golang.org][Go]]
+- a testbed for `R&D` in [[https://golang.org][Go]] and concurrent frameworks
+- uses [[https://github.com/go-hep/fwk][go-hep/fwk]] to expose, manage and harness concurrency into the usual `HEP` event loop (`initialize` | `process-events` | `finalize`)
+
+Code is on github (BSD-3):
+
+.link https://github.com/go-hep/fwk
+.link https://github.com/go-hep/fads
+
+Documentation is served by [[https://godoc.org][godoc.org]], CI by [[https://drone.io/github.com/go-hep/fads/latest][drone.io]]:
+
+.link https://godoc.org/github.com/go-hep/fwk
+.link https://godoc.org/github.com/go-hep/fads
+
+* go-hep/fads - Installation
+
+As easy as:
+
+  $ export GOPATH=$HOME/dev/gocode
+  $ export PATH=$GOPATH/bin:$PATH
+  
+  $ go get github.com/go-hep/fads/...
+
+Yes, with the ellipsis at the end, to also install sub-packages.
+
+- `go` `get` will recursively download and install all the packages that [[https://github.com/go-hep/fads][go-hep/fads]] depends on. (no `Makefile` needed)
+
+- you get a *statically* *linked* executable in a matter of seconds (even for large projects)
+
+- *simplify* deployment, distribution
+
+- the *speed* of development of `python` with the *speed* of execution of `C++`
+
+
+* go-hep/fwk - Concurrency
+
+[[https://github.com/go-hep/fwk][fwk]] enables:
+- event-level concurrency
+- tasks-level concurrency
+
+[[https://github.com/go-hep/fwk][fwk]] relies on [[https://golang.org][Go]]'s runtime to properly schedule _goroutines_.
+
+For sub-task concurrency, users are by construction required to use [[https://golang.org][Go]]'s constructs (_goroutines_ and _channels_) so everything is consistent *and* the _runtime_ has the *complete* *picture*.
+
+- *Note:* [[https://golang.org][Go]]'s runtime isn't yet _NUMA-aware_. A proposal for _Go-1.5_ _(June-2015)_ is in the [[https://docs.google.com/document/d/1d3iI2QWURgDIsSR6G2275vMeQ_X7w-qxM2Vp7iGwwuM/pub][works]].
+
+
+* go-hep/fads - real world use case
+
+- translated [[https://cp3.irmp.ucl.ac.be/projects/delphes][C++-Delphes]]' ATLAS data-card into Go
+- [[https://github.com/go-hep/fads/blob/master/cmd/fads-app/main.go][go-hep/fads-app]]
+- installation:
+
+  $ go get github.com/go-hep/fads/cmd/fads-app
+  $ fads-app -help
+  Usage: fads-app [options] <hepmc-input-file>
+  
+  ex:
+   $ fads-app -l=INFO -evtmax=-1 ./testdata/hepmc.data
+  
+  options:
+    -cpu-prof=false: enable CPU profiling
+    -evtmax=-1: number of events to process
+    -l="INFO": log level (DEBUG|INFO|WARN|ERROR)
+    -nprocs=0: number of concurrent events to process
+
+* go-hep/fads - components
+
+- a `HepMC` converter
+- particle propagator
+- calorimeter simulator
+- energy rescaler, momentum smearer
+- isolation
+- b-tagging, tau-tagging
+- jet-finder (reimplementation of FastJet in Go: [[https://github.com/go-hep/fastjet][go-hep/fastjet]])
+- histogram service (from [[https://github.com/go-hep/fwk][go-hep/fwk]])
+
+Caveats:
+
+- no real persistency to speak of (_i.e.:_ `JSON`, `ASCII` and `Gob`)
+- jet clustering limited to N^3 (slowest and dumbest scheme of `C++-FastJet`)
+
+
+* 
+
+
+.image _figs/fads-dflow.png 600 600
+
+
+* Performances - testbenches
+
+- Linux: Intel(R) Core(TM)2 Duo CPU @ 2.53GHz, 4GB RAM, 2 cores
+- MacOSX-10.6: Intel(R) Xeon(R) CPU @ 2.27GHz, 172GB RAM, 16 cores
+- Linux: Intel(R) Xeon(R) CPU E5-2660 v2 @ 2.20GHz, 40 cores
+
+* Linux (40 cores) testbench: memory
+
+.image _figs/lhcb3-rss.png 550 800
+
+## * Linux (40 cores) testbench: CPU
+## 
+## .image _figs/lhcb3-cpu.png 550 800
+
+* Linux (40 cores) testbench: event throughput
+
+.image _figs/lhcb3-hz.png 550 800
+
+
+* go-hep
+
+* go-hep project
+
+A set of pure-Go or bindings to `HEP` libraries
+
+- [[https://github.com/go-hep/fads][go-hep/fads]]: fast detector simulation toolkit
+- [[https://github.com/go-hep/fastjet][go-hep/fastjet]]: jet clustering algorithms (WIP)
+- [[https://github.com/go-hep/fmom][go-hep/fmom]]: 4-vectors
+- [[https://github.com/go-hep/fwk][go-hep/fwk]]: concurrent framework
+- [[https://github.com/go-hep/hbook][go-hep/hbook]]: histograms and n-tuples (WIP)
+- [[https://github.com/go-hep/hplot][go-hep/hplot]]: interactive plotting (WIP)
+- [[https://github.com/go-hep/hepmc][go-hep/hepmc]]: `HepMC` in [[https://golang.org][Go]] (EDM + `I/O`)
+
+* go-hep + astrogo project (cont'd)
+
+- [[https://github.com/go-hep/hepevt][go-hep/hepevt]]: `HEPEVT` bindings
+- [[https://github.com/go-hep/heppdt][go-hep/heppdt]]: `HEP` particle data table
+- [[https://github.com/go-hep/lhef][go-hep/lhef]]: Les Houches Event File format
+
+- [[https://github.com/go-hep/croot][go-hep/croot]]: bindings to a subset of `ROOT` `I/O`
+- [[https://github.com/go-hep/rio][go-hep/rio]]: `go-hep` record oriented `I/O`
+- [[https://github.com/go-hep/sio][go-hep/sio]]: `LCIO` `I/O`
+- [[https://github.com/go-hep/slha][go-hep/slha]]: `SUSY` Les Houches Accord `I/O`
+
+
+- [[https://github.com/astrogo/cfitsio][astrogo/cfitsio]]: bindings to `FITSIO`
+- [[https://github.com/astrogo/fitsio][astrogo/fitsio]]: pure [[https://golang.org][Go]] `I/O` for `FITS` files
+- [[https://github.com/astrogo/vo][astrogo/vo/votable]]: `I/O` for `VOTable`
+
+- [[https://github.com/sbinet/go-hdf5][sbinet/hdf5]]: bindings to `HDF5`
+
+
+* go-hep & HSF
+
+Most of development workflow already addressed (doc, CI, DVCS)
+
+HSF could provide (from [[https://github.com/go-hep][go-hep]] POV):
+
+- wider audience (users, developers)
+- test machines/architectures
+- storage area for input data (for tests) and/or (binary) releases
+- agreement on cross-language interoperability (file formats, data layout) in a *non* pure- `C++` environment
+
