@@ -53,7 +53,7 @@ Yes, with the ellipsis at the end, to also install sub-packages.
 
 For sub-task concurrency, users are by construction required to use [[https://golang.org][Go]]'s constructs (_goroutines_ and _channels_) so everything is consistent *and* the _runtime_ has the *complete* *picture*.
 
-- *Note:* [[https://golang.org][Go]]'s runtime isn't yet _NUMA-aware_. A proposal for _Go-1.5_ _(June-2015)_ is in the [[https://docs.google.com/document/d/1d3iI2QWURgDIsSR6G2275vMeQ_X7w-qxM2Vp7iGwwuM/pub][works]].
+- *Note:* [[https://golang.org][Go]]'s runtime isn't yet _NUMA-aware_. A proposal for _Go-1.6_ _(beg-2016)_ is in the [[https://docs.google.com/document/d/1d3iI2QWURgDIsSR6G2275vMeQ_X7w-qxM2Vp7iGwwuM/pub][works]].
 
 
 * go-hep/fads - real world use case
