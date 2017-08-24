@@ -260,6 +260,7 @@ No `Makefile`, no `CMakeList.txt`, no `pom.xml`, ...
 - [[https://godoc.org/go-hep.org/x/hep/cmd/yoda2rio][cmd/yoda2rio]]: converts YODA files to `rio`
 - [[https://godoc.org/go-hep.org/x/hep/rootio/cmd/root-ls][cmd/root-ls]]: inspects `ROOT` files' content
 - [[https://godoc.org/go-hep.org/x/hep/rootio/cmd/root-srv][cmd/root-srv]]: web server that displays `ROOT` files' content (plots TH1x, TH2x, TTrees)
+- [[https://github.com/go-hep/hep/tree/master/pawgo][PAWgo]]: a (WIP) reimplementation of `PAW` in Go
 
 * fads
 
