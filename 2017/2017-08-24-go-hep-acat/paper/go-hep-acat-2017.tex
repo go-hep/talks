@@ -181,13 +181,13 @@ This application is composed of:
 \end{itemize}
 
 The jet finder task is based on a naive re-implementation of the \texttt{C++} FastJet~\cite{ref-fastjet} library: only the $N^3$ "dumb" clustering has been implemented so far.
-The directed acyclic graph of the resulting \texttt{fads-app} application can be found in figure~\ref{fig-dflow}.
+A small part of the directed acyclic graph of the resulting \texttt{fads-app} application can be found in figure~\ref{fig-dflow}.
 
 \begin{figure}[h]
 	\begin{center}
- \includegraphics[width=0.75\textwidth]{figs/fads-dflow.png}
+ \includegraphics[width=0.75\textwidth]{figs/fads-dflow-detail.png}
 	\end{center}
-	\caption{\label{fig-dflow}The directed acyclic graph of data dependencies between tasks composing the \texttt{fads-app}, a \texttt{Go} transliteration of the Delphes' ATLAS data card example. Rectangles are tasks, ellipses are data collections.}
+	\caption{\label{fig-dflow}Part of the directed acyclic graph of data dependencies between tasks composing the \texttt{fads-app}, a \texttt{Go} transliteration of the Delphes' ATLAS data card example. Rectangles are tasks, ellipses are data collections.}
 \end{figure}
 
 Delphes was compiled with \texttt{gcc-4.8} and the $N^3$ clustering strategy hard-coded, \texttt{fads} was compiled with \texttt{Go-1.9}.
@@ -220,7 +220,7 @@ The output simulated data for \texttt{fads} was matched bit-by-bit with that of 
 
 \texttt{fads} exports another application, \texttt{fads-rivet-mc-generic}, a reimplementation of the \texttt{MC\_GENERIC} analysis from the Rivet~\cite{ref-rivet} toolkit.
 
-\begin{figure}[h]
+\begin{table}[h]
 \begin{center}
   \begin{tabular}{ l | c | c | c | c }
 	   & \texttt{MaxRSS} ($Mb$) & Real ($s$) & CPU ($s$) \\
@@ -231,7 +231,7 @@ The output simulated data for \texttt{fads} was matched bit-by-bit with that of 
   \end{tabular}
 	\caption{\label{fig-rivet-perf-tab}Runtime performances of \texttt{Rivet} and \texttt{fads} to read a file with $Z$ events.}
 \end{center}
-\end{figure}
+\end{table}
 
 \texttt{fads} shows better performances than the \texttt{C++} application.
 As Rivet does not use ROOT for this application, the memory usage of Rivet is closer to that of \texttt{fads}.
@@ -383,7 +383,7 @@ One file was compressed with the default settings of ROOT-6.10 ($686 Mb$) and th
 %% 	\caption{\label{fig-rootio-read-perf}\texttt{hep/rootio} reading performance program.}
 %% \end{figure}
 
-\begin{figure}[h]
+\begin{table}[h]
 \begin{center}
   \begin{tabular}{ l | c | c | c | c }
 	  \texttt{fCompression=0} & \texttt{VMem} ($Mb$) & \texttt{MaxRSS} ($Mb$) & Real ($s$) & CPU ($s$) \\
@@ -404,7 +404,7 @@ One file was compressed with the default settings of ROOT-6.10 ($686 Mb$) and th
   \end{tabular}
 	\caption{\label{fig-rootio-perf-tab}Runtime performances of \texttt{C++/ROOT} and \texttt{hep/rootio} to read a file with $10^6$ events, using no compression (up) and with default compression (down).}
 \end{center}
-\end{figure}
+\end{table}
 
 Table~\ref{fig-rootio-perf-tab} shows the results obtained running the two programs with the compressed file and the uncompressed file as inputs.
 While the memory footprint of the \texttt{Go} program is almost an order of magnitude lower than its \texttt{C++} counterpart, it is twice as slow in the non-compressed case and almost thrice in the compressed case.
